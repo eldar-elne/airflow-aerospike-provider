@@ -60,6 +60,8 @@ class AerospikeHook(BaseHook):
 
     #TODO: add touch method
     
+    #TODO: add get/get many method
+    
 
     # TODO: fix this
     def test_connection(self) -> Tuple[bool, str]:
