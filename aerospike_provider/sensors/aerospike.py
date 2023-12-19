@@ -44,6 +44,13 @@ class AerospikeKeySensor(BaseSensorOperator):
         self.policy = policy
         self.aerospike_conn_id = aerospike_conn_id
 
+    def poke(self, context: Context) -> bool:
+        hook = AerospikeHook(self.aerospike_conn_id)
+        key_len = len(self.key) if isinstance(self.key, list) else 1
+        self.log.info('Poking %s keys', key_len)
+        records = hook.exists(namespace=self.namespace, set=self.set, key=self.key)
+        return self.parse_records(records=records)
+    
     def parse_records(self, records: Union[List, tuple]) -> bool:
         if isinstance(records, list):
             metadata = all(record[1] for record in records)
@@ -52,10 +59,3 @@ class AerospikeKeySensor(BaseSensorOperator):
         else:
             raise ValueError(f"Expecting list or tuple, got: {type(records)}")
         return metadata
-    
-    def poke(self, context: Context) -> bool:
-        
-        hook = AerospikeHook(self.aerospike_conn_id)
-        self.log.info('Poking %s keys', len(self.key))
-        records = hook.exists(namespace=self.namespace, set=self.set, key=self.key, policy=self.policy)
-        return self.parse_records(records=records)
