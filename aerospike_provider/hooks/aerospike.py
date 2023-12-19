@@ -9,6 +9,8 @@ from collections import namedtuple
 
 class AerospikeHook(BaseHook):
     """
+    Interact with Aerospike.
+    
     Creates a client to Aerospike and runs a command.
 
     :param aerospike_conn_id: Reference to :ref:`Aerospike connection id`.
@@ -41,12 +43,12 @@ class AerospikeHook(BaseHook):
         return self.client
 
     @overload
-    def exists(self, namespace: str, set: str, key: List[str], policy: dict): ...
+    def exists(self, namespace: str, set: str, key: List[str], policy: dict) -> list: ...
 
     @overload
-    def exists(self, namespace: str, set: str, key: str, policy: dict): ...
+    def exists(self, namespace: str, set: str, key: str, policy: dict) -> tuple: ...
 
-    def exists(self, key: Union[List[str], str], namespace:str, set: str, policy: dict={'key': aerospike.POLICY_KEY_SEND}):
+    def exists(self, key: Union[List[str], str], namespace:str, set: str, policy: dict) -> Union[list, tuple]:
         client = self.get_conn()
         if isinstance(key, list):
             keys = [(namespace, set, k) for k in key]
@@ -54,7 +56,9 @@ class AerospikeHook(BaseHook):
         return client.exists((namespace, set, key), policy)
 
 
-    #TODO: add put/put_many method
+    def put(self, key: str, bins: dict, metadata: dict, namespace: str, set: str, policy: dict) -> None:
+        client = self.get_conn()
+        return client.put((namespace, set, key), bins, metadata, policy)
 
     #TODO: add delete/delete_many method
 
