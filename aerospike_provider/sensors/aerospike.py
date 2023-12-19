@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Sequence, Union, List
 if TYPE_CHECKING:
     from airflow.utils.context import Context
 
+import aerospike
 from aerospike_provider.hooks.aerospike import AerospikeHook
 from airflow.sensors.base import BaseSensorOperator
 
@@ -30,6 +31,7 @@ class AerospikeKeySensor(BaseSensorOperator):
         namespace: str,
         set: str,
         key: Union[List[str], str],
+        policy: dict = {'key': aerospike.POLICY_KEY_SEND},
         aerospike_conn_id: str = "aerospike_default",
         **kwargs: Any,
     ) -> None:
@@ -38,6 +40,7 @@ class AerospikeKeySensor(BaseSensorOperator):
         self.namespace = namespace
         self.set = set
         self.key = key
+        self.policy = policy
         self.aerospike_conn_id = aerospike_conn_id
 
     def parse_records(self, records: Union[List, tuple]) -> bool:
@@ -50,7 +53,8 @@ class AerospikeKeySensor(BaseSensorOperator):
         return metadata
     
     def poke(self, context: Context) -> bool:
+        
         hook = AerospikeHook(self.aerospike_conn_id)
         self.log.info('Poking %s keys', len(self.key))
-        records = hook.exists(namespace=self.namespace, set=self.set, key=self.key)
+        records = hook.exists(namespace=self.namespace, set=self.set, key=self.key, policy=self.policy)
         return self.parse_records(records=records)

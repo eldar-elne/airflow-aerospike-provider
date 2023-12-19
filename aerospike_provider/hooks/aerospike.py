@@ -46,9 +46,9 @@ class AerospikeHook(BaseHook):
     @overload
     def exists(self, namespace: str, set: str, key: str, policy: dict): ...
 
-    def exists(self, key: Union[List[str], str], namespace:str, set: str, policy: dict={'key': aerospike.POLICY_KEY_SEND}):
+    def exists(self, key: Union[List[str], str], namespace:str, set: str, policy: dict):
         client = self.get_conn()
-        if isinstance(key, list) and len(key) > 1:
+        if isinstance(key, list):
             keys = [(namespace, set, k) for k in key]
             return client.exists_many(keys, policy)
         return client.exists((namespace, set, key), policy)
