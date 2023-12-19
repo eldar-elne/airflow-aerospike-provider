@@ -24,7 +24,7 @@ class AerospikePutKey(BaseOperator):
     :param policy: which policy the key should be saved with. default `POLICY_KEY_SEND`
     """
 
-    template_fields: Sequence[str] = ("key",)
+    template_fields: Sequence[str] = ("key", "bins", "metadata", )
     template_ext: Sequence[str] = ()
     ui_color = "#66c3ff"
 
