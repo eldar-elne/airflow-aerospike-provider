@@ -60,7 +60,6 @@ class AerospikeHook(BaseHook):
         client = self.get_conn()
         return client.put((namespace, set, key), bins, metadata, policy)
 
-
     #TODO: add delete/delete_many method
 
     #TODO: add touch method
