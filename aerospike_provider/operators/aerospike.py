@@ -13,6 +13,7 @@ from airflow.models.baseoperator import BaseOperator
 class AerospikePutKey(BaseOperator):
     """
     Create a new record, add or remove bins.
+    
     This can also remove a record (if exists) using `<bin_name>.isnull()` if it's the last bin.
 
     :param aerospike_conn_id: aerospike connection to use, defaults to 'aerospike_default'
