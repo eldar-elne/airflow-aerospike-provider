@@ -20,7 +20,7 @@ class AerospikePutKey(BaseOperator):
     :param key: key to save in the db.
     :param namespace: namespace to use in aerospike db
     :param set: set name in the namespace
-    :param bins: bin name(s) with data saved along with a key. For example: `{"bin": value}`
+    :param bins: bins name and data saved along with a key as key values. For example: `{"bin": value}`
     :param metadata: metadata about the key eg. ttl. For example: `{"ttl": 0}`
     :param policy: which policy the key should be saved with. default `POLICY_EXISTS_IGNORE`. ref: https://developer.aerospike.com/client/usage/atomic/update#policies
     """
