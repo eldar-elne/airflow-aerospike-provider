@@ -22,7 +22,7 @@ class AerospikePutKey(BaseOperator):
     :param set: set name in the namespace
     :param bins: bin name(s) with data saved along with a key. For example: `{"bin": value}`
     :param metadata: metadata about the key eg. ttl. For example: `{"ttl": 0}`
-    :param policy: which policy the key should be saved with. default `POLICY_KEY_SEND`
+    :param policy: which policy the key should be saved with. default `POLICY_EXISTS_IGNORE`. ref: https://developer.aerospike.com/client/usage/atomic/update#policies
     """
 
     template_fields: Sequence[str] = ("key", "bins", "metadata", )
@@ -36,7 +36,7 @@ class AerospikePutKey(BaseOperator):
         key: str,
         bins: dict,
         metadata: dict = None,
-        policy: dict = {'key': aerospike.POLICY_KEY_SEND},
+        policy: dict = {'key': aerospike.POLICY_EXISTS_IGNORE},
         aerospike_conn_id: str = "aerospike_default",
         **kwargs: Any,
     ) -> None:
