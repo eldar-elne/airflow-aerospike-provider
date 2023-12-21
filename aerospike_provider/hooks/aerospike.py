@@ -89,7 +89,9 @@ class AerospikeHook(BaseHook):
                 return client.get_many(keys, policy)
             return client.get((namespace, set, key), policy)
         
-    #TODO: add touch method
+    def touch_record(self, namespace: str, set: str, key: str, ttl: int, policy: dict = None) -> None:
+        with AerospikeClientContextManager(client=self.get_conn()) as client:
+            client.touch(key=(namespace, set, key), val=ttl, policy=policy)
     
     # TODO: fix this
     def test_connection(self) -> Tuple[bool, str]:
