@@ -39,7 +39,7 @@ class AerospikeHook(BaseHook):
 
     def __init__(self, conn_id: str = default_conn_name, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.aerospike_conn_id = conn_id
+        self.conn_id = conn_id
         self.connection = kwargs.pop("connection", None)
         self.client = None
 
@@ -50,7 +50,7 @@ class AerospikeHook(BaseHook):
         if self.client is not None:
             return self.client
 
-        self.connection = self.get_connection(self.aerospike_conn_id)
+        self.connection = self.get_connection(self.conn_id)
         
         config = {'hosts': [ (self.connection.host, self.connection.port) ]}
         self.log.info('Hosts: %s', config['hosts'][0])
