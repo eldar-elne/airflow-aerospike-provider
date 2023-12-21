@@ -50,7 +50,7 @@ class AerospikeKeySensor(BaseSensorOperator):
         elif isinstance(records, tuple):
             metadata = True if records[1] else False
         else:
-            raise ValueError(f"Expecting list or tuple, got: {type(records)}")
+            raise ValueError(f"Expecting 'list' or 'tuple', got: {type(records)}")
         return metadata
     
     def poke(self, context: Context) -> bool:
