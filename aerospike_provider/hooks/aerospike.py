@@ -3,8 +3,8 @@
 import aerospike
 from aerospike import Client
 from typing import Tuple, overload, List, Union
+from types import TracebackType
 from airflow.hooks.base import BaseHook
-from collections import namedtuple
 
 class AerospikeClientContextManager:
     def __init__(self, client: Client) -> None:
@@ -13,9 +13,15 @@ class AerospikeClientContextManager:
     def __enter__(self) -> Client:
         return self.client
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self, 
+        exc_type: Union[BaseException, None],
+        exc_val: Union[BaseException, None], 
+        exc_tb: Union[TracebackType, None]
+        ) -> None:
         if self.client is not None:
             self.client.close()
+            self.client = None
             
 class AerospikeHook(BaseHook):
     """
@@ -58,7 +64,7 @@ class AerospikeHook(BaseHook):
     @overload
     def exists(self, namespace: str, set: str, key: str, policy: dict) -> tuple: ...
 
-    def exists(self, key: Union[List[str], str], namespace:str, set: str, policy: dict) -> Union[list, tuple]:
+    def exists(self, namespace:str, set: str, key: Union[List[str], str], policy: dict) -> Union[list, tuple]:
         with AerospikeClientContextManager(client=self.get_conn()) as client:
             if isinstance(key, list):
                 keys = [(namespace, set, k) for k in key]
@@ -76,15 +82,13 @@ class AerospikeHook(BaseHook):
     @overload
     def get_record(self, namespace: str, set: str, key: str, policy: dict) -> tuple: ...
 
-    def get_record(self, key: Union[List[str], str], namespace:str, set: str, policy: dict) -> Union[list, tuple]:
+    def get_record(self, namespace:str, set: str, key: Union[List[str], str], policy: dict) -> Union[list, tuple]:
         with AerospikeClientContextManager(client=self.get_conn()) as client:
             if isinstance(key, list):
                 keys = [(namespace, set, k) for k in key]
                 return client.get_many(keys, policy)
             return client.get((namespace, set, key), policy)
         
-    #TODO: add delete/delete_many method
-
     #TODO: add touch method
     
     # TODO: fix this
