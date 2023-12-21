@@ -6,7 +6,17 @@ from typing import Tuple, overload, List, Union
 from airflow.hooks.base import BaseHook
 from collections import namedtuple
 
+class AerospikeClientContextManager:
+    def __init__(self, client: Client) -> None:
+        self.client = client
 
+    def __enter__(self) -> Client:
+        return self.client
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.client is not None:
+            self.client.close()
+            
 class AerospikeHook(BaseHook):
     """
     Interact with Aerospike.
@@ -49,30 +59,40 @@ class AerospikeHook(BaseHook):
     def exists(self, namespace: str, set: str, key: str, policy: dict) -> tuple: ...
 
     def exists(self, key: Union[List[str], str], namespace:str, set: str, policy: dict) -> Union[list, tuple]:
-        client = self.get_conn()
-        if isinstance(key, list):
-            keys = [(namespace, set, k) for k in key]
-            return client.exists_many(keys, policy)
-        return client.exists((namespace, set, key), policy)
+        with AerospikeClientContextManager(client=self.get_conn()) as client:
+            if isinstance(key, list):
+                keys = [(namespace, set, k) for k in key]
+                return client.exists_many(keys, policy)
+            return client.exists((namespace, set, key), policy)
 
 
     def put(self, key: str, bins: dict, metadata: dict, namespace: str, set: str, policy: dict) -> None:
-        client = self.get_conn()
-        return client.put((namespace, set, key), bins, metadata, policy)
+        with AerospikeClientContextManager(client=self.get_conn()) as client:
+            return client.put((namespace, set, key), bins, metadata, policy)
 
+    @overload
+    def get_record(self, namespace: str, set: str, key: List[str], policy: dict) -> list: ...
+
+    @overload
+    def get_record(self, namespace: str, set: str, key: str, policy: dict) -> tuple: ...
+
+    def get_record(self, key: Union[List[str], str], namespace:str, set: str, policy: dict) -> Union[list, tuple]:
+        with AerospikeClientContextManager(client=self.get_conn()) as client:
+            if isinstance(key, list):
+                keys = [(namespace, set, k) for k in key]
+                return client.get_many(keys, policy)
+            return client.get((namespace, set, key), policy)
+        
     #TODO: add delete/delete_many method
 
     #TODO: add touch method
     
-    #TODO: add get/get many method
-    
-
     # TODO: fix this
     def test_connection(self) -> Tuple[bool, str]:
         """Test the Aerospike connection by conneting to it."""
-        # try:
-        #     self.get_conn().is_connected()
-        # except Exception as e:
-        #     return False, str(e)
-        # return True, "Connection successfully tested"
-        ...
+        try:
+            with AerospikeClientContextManager(client=self.get_conn()) as client:
+                client.is_connected()
+        except Exception as e:
+            return False, str(e)
+        return True, "Connection successfully tested"
