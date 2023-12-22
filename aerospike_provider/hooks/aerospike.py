@@ -1,10 +1,15 @@
 """This module allows to connect to a Aerospike database."""
 
-import aerospike
-from aerospike import Client
 from typing import Tuple, overload, List, Union, Dict
 from types import TracebackType
+
 from airflow.hooks.base import BaseHook
+from airflow.exceptions import AirflowException
+
+import aerospike
+from aerospike import Client
+
+
 
 # class AerospikeClientContextManager:
 #     def __init__(self, client: Client) -> None:
@@ -47,6 +52,7 @@ class AerospikeHook(BaseHook):
             self.client.close()
             self.client = None
 
+
     def get_conn(self) -> Client:
         """
         A method that initiates a new Aerospike connection.
@@ -62,36 +68,53 @@ class AerospikeHook(BaseHook):
         self.client = aerospike.client(config).connect()
         return self.client
 
-    @overload
-    def exists(self, client: Client, namespace: str, set: str, key: List[str], policy: dict) -> list: ...
 
     @overload
-    def exists(self, client: Client, namespace: str, set: str, key: str, policy: dict) -> tuple: ...
+    def exists(self, namespace: str, set: str, key: List[str], policy: dict) -> list: ...
 
-    def exists(self, client: Client, namespace:str, set: str, key: Union[List[str], str], policy: dict) -> Union[list, tuple]:
+
+    @overload
+    def exists(self, namespace: str, set: str, key: str, policy: dict) -> tuple: ...
+
+
+    def exists(self, namespace:str, set: str, key: Union[List[str], str], policy: dict) -> Union[list, tuple]:
+        if not self.client:
+            raise AirflowException("The 'client' should be initialized before!")
         if isinstance(key, list):
             keys = [(namespace, set, k) for k in key]
-            return client.exists_many(keys, policy)
-        return client.exists((namespace, set, key), policy)
+            return self.client.exists_many(keys, policy)
+        return self.client.exists((namespace, set, key), policy)
 
-    def put(self, client: Client, key: str, bins: dict, metadata: dict, namespace: str, set: str, policy: dict) -> None:
-        return client.put((namespace, set, key), bins, metadata, policy)
+
+    def put(self, key: str, bins: dict, metadata: dict, namespace: str, set: str, policy: dict) -> None:
+        if not self.client:
+            raise AirflowException("The 'client' should be initialized before!")        
+        return self.client.put((namespace, set, key), bins, metadata, policy)
+
 
     @overload
-    def get_record(self, client: Client, namespace: str, set: str, key: List[str], policy: dict) -> list: ...
+    def get_record(self, namespace: str, set: str, key: List[str], policy: dict) -> list: ...
+
 
     @overload
-    def get_record(self, client: Client, namespace: str, set: str, key: str, policy: dict) -> tuple: ...
+    def get_record(self, namespace: str, set: str, key: str, policy: dict) -> tuple: ...
 
-    def get_record(self, client: Client, namespace:str, set: str, key: Union[List[str], str], policy: dict) -> Union[list, tuple]:
+
+    def get_record(self, namespace:str, set: str, key: Union[List[str], str], policy: dict) -> Union[list, tuple]:
+        if not self.client:
+            raise AirflowException("The 'client' should be initialized before!")
         if isinstance(key, list):
             keys = [(namespace, set, k) for k in key]
-            return client.get_many(keys, policy)
-        return client.get((namespace, set, key), policy)
+            return self.client.get_many(keys, policy)
+        return self.client.get((namespace, set, key), policy)
         
-    def touch_record(self, client: Client, namespace: str, set: str, key: str, ttl: int, policy: dict = None) -> None:
-        client.touch(key=(namespace, set, key), val=ttl, policy=policy)
+
+    def touch_record(self, namespace: str, set: str, key: str, ttl: int, policy: dict = None) -> None:
+        if not self.client:
+            raise AirflowException("The 'client' should be initialized before!")        
+        self.client.touch(key=(namespace, set, key), val=ttl, policy=policy)
     
+
     @staticmethod
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour"""
@@ -107,7 +130,7 @@ class AerospikeHook(BaseHook):
             },
         }
         
-    # TODO: fix this
+
     def test_connection(self) -> Tuple[bool, str]:
         """Test the Aerospike connection by conneting to it."""
         try:
