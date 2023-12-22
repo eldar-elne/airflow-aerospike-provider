@@ -9,12 +9,6 @@ from airflow.exceptions import AirflowException
 import aerospike
 from aerospike import Client
 
-
-
-# class AerospikeClientContextManager:
-#     def __init__(self, client: Client) -> None:
-#         self.client = client
-
             
 class AerospikeHook(BaseHook):
     """
