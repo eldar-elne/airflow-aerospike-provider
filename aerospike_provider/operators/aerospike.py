@@ -51,11 +51,10 @@ class AerospikePutKey(BaseOperator):
         self.aerospike_conn_id = aerospike_conn_id
     
     def execute(self, context: Context) -> None:
-        
-        hook = AerospikeHook(self.aerospike_conn_id)
-        self.log.info('Storing %s as key', self.key)
-        hook.put(key=self.key, bins=self.bins, metadata=self.metadata, namespace=self.namespace, set=self.set, policy=self.policy)
-        self.log.info('Stored key successfully')
+        with AerospikeHook(self.aerospike_conn_id) as hook:
+            self.log.info('Storing %s as key', self.key)
+            hook.put(key=self.key, bins=self.bins, metadata=self.metadata, namespace=self.namespace, set=self.set, policy=self.policy)
+            self.log.info('Stored key successfully')
 
 
 class AerospikeGetKey(BaseOperator):
@@ -91,12 +90,12 @@ class AerospikeGetKey(BaseOperator):
         self.aerospike_conn_id = aerospike_conn_id
 
     def execute(self, context: Context) -> None:
-        hook = AerospikeHook(self.aerospike_conn_id)
-        self.log.info('Fetching key')
-        records = hook.get_record(key=self.key, namespace=self.namespace, set=self.set, policy=self.policy)
-        parsed_records = self.parse_records(records=records)
-        self.log.info('Got %s records', len(parsed_records))
-        return parsed_records
+        with AerospikeHook(self.aerospike_conn_id) as hook:
+            self.log.info('Fetching key')
+            records = hook.get_record(key=self.key, namespace=self.namespace, set=self.set, policy=self.policy)
+            parsed_records = self.parse_records(records=records)
+            self.log.info('Got %s records', len(parsed_records))
+            return parsed_records
         
     def parse_records(self, records: Union[List, tuple]) -> list:
         if isinstance(records, list):

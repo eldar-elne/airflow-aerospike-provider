@@ -55,7 +55,7 @@ class AerospikeKeySensor(BaseSensorOperator):
     
     def poke(self, context: Context) -> bool:
         
-        hook = AerospikeHook(self.aerospike_conn_id)
-        self.log.info('Poking %s keys', len(self.key))
-        records = hook.exists(namespace=self.namespace, set=self.set, key=self.key, policy=self.policy)
-        return self.parse_records(records=records)
+        with AerospikeHook(self.aerospike_conn_id) as hook:
+            self.log.info('Poking %s keys', len(self.key))
+            records = hook.exists(namespace=self.namespace, set=self.set, key=self.key, policy=self.policy)
+            return self.parse_records(records=records)
