@@ -66,7 +66,7 @@ class AerospikeHook(BaseHook):
         self.log.info('Hosts: %s', config['hosts'][0])
 
         self.client = aerospike.client(config).connect()
-        return self.client
+        return self
 
 
     @overload
