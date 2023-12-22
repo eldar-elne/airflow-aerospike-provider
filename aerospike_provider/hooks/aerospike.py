@@ -2,7 +2,7 @@
 
 import aerospike
 from aerospike import Client
-from typing import Tuple, overload, List, Union
+from typing import Tuple, overload, List, Union, Dict
 from types import TracebackType
 from airflow.hooks.base import BaseHook
 
@@ -93,6 +93,16 @@ class AerospikeHook(BaseHook):
         with AerospikeClientContextManager(client=self.get_conn()) as client:
             client.touch(key=(namespace, set, key), val=ttl, policy=policy)
     
+    @staticmethod
+    def get_ui_field_behaviour() -> Dict:
+        """Returns custom field behaviour"""
+        return {
+            "placeholders": {
+                "port": "3000",
+                "host": "cluster node address (The client will learn about the other nodes in the cluster from the seed node)"
+            },
+        }
+        
     # TODO: fix this
     def test_connection(self) -> Tuple[bool, str]:
         """Test the Aerospike connection by conneting to it."""
