@@ -97,6 +97,11 @@ class AerospikeHook(BaseHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour"""
         return {
+            "hidden_fields": ["schema", "login", "password"],
+            "relabeling": {
+                "host": "host",
+                "port": "port"
+            },
             "placeholders": {
                 "port": "3000",
                 "host": "cluster node address (The client will learn about the other nodes in the cluster from the seed node)"
