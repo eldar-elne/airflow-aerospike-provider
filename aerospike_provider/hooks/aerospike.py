@@ -1,6 +1,6 @@
 """This module allows to connect to a Aerospike database."""
 
-from typing import Tuple, overload, List, Union, Dict
+from typing import Tuple, overload, List, Union, Dict, Any, Optional
 from types import TracebackType
 
 from airflow.hooks.base import BaseHook
@@ -103,7 +103,7 @@ class AerospikeHook(BaseHook):
         return self.client.get((namespace, set, key), policy)
         
 
-    def touch_record(self, namespace: str, set: str, key: str, ttl: int, policy: dict = None) -> None:
+    def touch_record(self, namespace: str, set: str, key: str, ttl: int, policy: Optional[Dict] = None) -> None:
         if not self.client:
             raise AirflowException("The 'client' should be initialized before!")        
         self.client.touch(key=(namespace, set, key), val=ttl, policy=policy)

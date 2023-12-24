@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Sequence, Union, List
+from typing import TYPE_CHECKING, Any, Sequence, Union, List, Dict, Any
 
 if TYPE_CHECKING:
     from airflow.utils.context import Context
@@ -35,8 +35,8 @@ class AerospikePutKeyOperator(BaseOperator):
         set: str,
         key: str,
         bins: dict,
-        metadata: dict = None,
-        policy: dict = {'key': aerospike.POLICY_EXISTS_IGNORE},
+        metadata: Union[dict, Any] = None,
+        policy: Dict[str, Any] = {'key': aerospike.POLICY_EXISTS_IGNORE},
         aerospike_conn_id: str = "aerospike_default",
         **kwargs: Any,
     ) -> None:
@@ -89,7 +89,7 @@ class AerospikeGetKeyOperator(BaseOperator):
         self.policy = policy
         self.aerospike_conn_id = aerospike_conn_id
 
-    def execute(self, context: Context) -> None:
+    def execute(self, context: Context) -> list:
         with AerospikeHook(self.aerospike_conn_id) as hook:
             self.log.info('Fetching key')
             records = hook.get_record(key=self.key, namespace=self.namespace, set=self.set, policy=self.policy)
@@ -108,7 +108,7 @@ class AerospikeGetKeyOperator(BaseOperator):
         return data
     
     @staticmethod
-    def create_dict_from_record(record: tuple) -> list:
+    def create_dict_from_record(record: tuple) -> dict:
         try:
             return {
                 "namespace": record[0][0], 
