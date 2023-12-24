@@ -27,7 +27,7 @@ class TestAerospikeHookConn(unittest.TestCase):
     @patch('aerospike.client')
     def test_get_conn_new_connection(self, mock_client):
         # mock_get_connection.return_value = MagicMock(host='localhost', port=3000)
-        
+
         mock_client_instance = MagicMock(host='localhost', port=3000)
     #     mock_client.connect.return_value = mock_client_instance # patch aerospike.client
     #     mock_client_instance.connect.return_value = mock_client_instance # mock aerospike.client
@@ -105,7 +105,7 @@ class TestAerospikeHookExistsMethod(unittest.TestCase):
         self.hook.client.exists_many.return_value = [True, False]
         result = self.hook.exists(test_namespace, test_set, test_keys, test_policy)
         expected_keys = [(test_namespace, test_set, k) for k in test_keys]
-        
+
         self.hook.client.exists_many.assert_called_with(expected_keys, test_policy)
         self.assertIsInstance(result, list)
 
@@ -114,7 +114,7 @@ class TestAerospikeHookExistsMethod(unittest.TestCase):
         mock_exception = Exception
         with self.assertRaises(mock_exception):
             self.hook.exists('namespace', 'set', 'key', {})
-            
+
 
 class TestAerospikeHookGetRecordMethod(unittest.TestCase):
 
@@ -130,7 +130,7 @@ class TestAerospikeHookGetRecordMethod(unittest.TestCase):
 
         self.hook.client.get.return_value = (True, {})
         result = self.hook.get_record(test_namespace, test_set, test_key, test_policy)
-        
+
         self.hook.client.get.assert_called_with((test_namespace, test_set, test_key), test_policy)
         self.assertIsInstance(result, tuple)
 
@@ -143,7 +143,7 @@ class TestAerospikeHookGetRecordMethod(unittest.TestCase):
         self.hook.client.get_many.return_value = [True, False]
         result = self.hook.get_record(test_namespace, test_set, test_keys, test_policy)
         expected_keys = [(test_namespace, test_set, k) for k in test_keys]
-        
+
         self.hook.client.get_many.assert_called_with(expected_keys, test_policy)
         self.assertIsInstance(result, list)
 

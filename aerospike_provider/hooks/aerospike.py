@@ -9,13 +9,13 @@ from airflow.exceptions import AirflowException
 import aerospike
 from aerospike import Client
 
-            
+
 class AerospikeHook(BaseHook):
     """
     Interact with Aerospike.
-    
+
     Creates a client to Aerospike and runs a command.
-    
+
     .. note:: Please call this Hook as context manager via `with`
     to automatically open and close the connection to the Aerospike cluster.
 
@@ -37,9 +37,9 @@ class AerospikeHook(BaseHook):
         return self.get_conn()
 
     def __exit__(
-        self, 
+        self,
         exc_type: Union[BaseException, None],
-        exc_val: Union[BaseException, None], 
+        exc_val: Union[BaseException, None],
         exc_tb: Union[TracebackType, None]
         ) -> None:
         if self.client is not None:
@@ -55,7 +55,7 @@ class AerospikeHook(BaseHook):
             return self.client
 
         self.connection = self.get_connection(self.aerospike_conn_id)
-        
+
         config = {'hosts': [ (self.connection.host, self.connection.port) ]}
         self.log.info('Hosts: %s', config['hosts'][0])
 
@@ -82,7 +82,7 @@ class AerospikeHook(BaseHook):
 
     def put(self, key: str, bins: dict, metadata: dict, namespace: str, set: str, policy: dict) -> None:
         if not self.client:
-            raise AirflowException("The 'client' should be initialized before!")        
+            raise AirflowException("The 'client' should be initialized before!")
         return self.client.put((namespace, set, key), bins, metadata, policy)
 
 
@@ -101,13 +101,13 @@ class AerospikeHook(BaseHook):
             keys = [(namespace, set, k) for k in key]
             return self.client.get_many(keys, policy)
         return self.client.get((namespace, set, key), policy)
-        
+
 
     def touch_record(self, namespace: str, set: str, key: str, ttl: int, policy: Optional[Dict] = None) -> None:
         if not self.client:
-            raise AirflowException("The 'client' should be initialized before!")        
+            raise AirflowException("The 'client' should be initialized before!")
         self.client.touch(key=(namespace, set, key), val=ttl, policy=policy)
-    
+
 
     @staticmethod
     def get_ui_field_behaviour() -> Dict:
@@ -123,7 +123,7 @@ class AerospikeHook(BaseHook):
                 "host": "cluster node address (The client will learn about the other nodes in the cluster from the seed node)"
             },
         }
-        
+
 
     def test_connection(self) -> Tuple[bool, str]:
         """Test the Aerospike connection by conneting to it."""

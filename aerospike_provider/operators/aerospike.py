@@ -13,9 +13,9 @@ from airflow.models.baseoperator import BaseOperator
 class AerospikePutKeyOperator(BaseOperator):
     """
     Create a new record, add or remove bins.
-    
+
     This can also remove a record (if exists) using `<bin_name>.isnull()` if it's the last bin.
-    
+
     :param key: key to save in the db.
     :param namespace: namespace to use in aerospike db
     :param set: set name in the namespace
@@ -49,7 +49,7 @@ class AerospikePutKeyOperator(BaseOperator):
         self.metadata = metadata
         self.policy = policy
         self.aerospike_conn_id = aerospike_conn_id
-    
+
     def execute(self, context: Context) -> None:
         with AerospikeHook(self.aerospike_conn_id) as hook:
             self.log.info('Storing %s as key', self.key)
@@ -96,7 +96,7 @@ class AerospikeGetKeyOperator(BaseOperator):
             parsed_records = self.parse_records(records=records)
             self.log.info('Got %s records', len(parsed_records))
             return parsed_records
-    
+
     def parse_records(self, records: Union[List, tuple]) -> list:
         # Removing the `bytearray` object from records since object of type bytearray is not JSON serializable for Xcom.
         if isinstance(records, list):
@@ -106,22 +106,22 @@ class AerospikeGetKeyOperator(BaseOperator):
         else:
             raise ValueError(f"Expecting 'list' or 'tuple', got: {type(records)}")
         return data
-    
+
     @staticmethod
     def create_dict_from_record(record: tuple) -> dict:
         try:
             return {
-                "namespace": record[0][0], 
-                "set": record[0][1], 
-                "key": record[0][2], 
-                "metadata": record[1], 
+                "namespace": record[0][0],
+                "set": record[0][1],
+                "key": record[0][2],
+                "metadata": record[1],
                 "bins": record[2]
             }
         except IndexError:
             # Handling an error when there are no 'bins' the data
             return {
-                "namespace": record[0][0], 
-                "set": record[0][1], 
-                "key": record[0][2], 
+                "namespace": record[0][0],
+                "set": record[0][1],
+                "key": record[0][2],
                 "metadata": record[1]
             }

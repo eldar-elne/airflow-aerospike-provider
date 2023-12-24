@@ -35,13 +35,13 @@ class TestAerospikeKeySensor(unittest.TestCase):
             policy={ aerospike.POLICY_KEY_SEND }
         )
 
-    def test_parse_records_with_existing_key_as_tuple(self):       
+    def test_parse_records_with_existing_key_as_tuple(self):
         mock = ( (self.namespace, self.set, self.key), self.metadata, self.bins)
         mock_parsed = self.sensor.parse_records(records=mock)
         expected = True
         assert mock_parsed == expected
 
-    def test_parse_records_with_no_existing_key_as_tuple(self):   
+    def test_parse_records_with_no_existing_key_as_tuple(self):
         mock = ( (self.namespace, self.set), None)              # Expecting None instead of metadata when key not exists.
         mock_parsed = self.sensor.parse_records(records=mock)
         expected = False

@@ -47,7 +47,7 @@ class TestAerospikeGetKeyOperator(unittest.TestCase):
         mock_parsed = self.operator.parse_records(records=mock)
 
         expected = [
-            {"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata, "bins": self.bins}, 
+            {"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata, "bins": self.bins},
             {"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata, "bins": self.bins}
             ]
         assert mock_parsed == expected
@@ -62,14 +62,14 @@ class TestAerospikeGetKeyOperator(unittest.TestCase):
     def test_create_dict_from_record_with_bins(self):
         mock = ( (self.namespace, self.set, self.key), self.metadata, self.bins)
         mock_result = self.operator.create_dict_from_record(record=mock)
-        
+
         expected = {"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata, "bins": self.bins}
         assert mock_result == expected
 
     def test_create_dict_from_record_no_bins(self):
         mock = ( (self.namespace, self.set, self.key), self.metadata)
         mock_result = self.operator.create_dict_from_record(record=mock)
-        
+
         expected = {"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata}
         assert mock_result == expected
 
@@ -90,7 +90,7 @@ class TestAerospikePutKeyOperator(unittest.TestCase):
     def test_execute(self, mock_hock_conn):
         mock_hock_conn.return_value = Mock()
         self.operator.execute({})
-        
+
         mock_hock_conn.return_value.put.assert_called_once_with(
             namespace='test_namespace',
             set='test_set',
@@ -99,6 +99,3 @@ class TestAerospikePutKeyOperator(unittest.TestCase):
             metadata={'ttl': 1000},
             policy={'key': aerospike.POLICY_EXISTS_IGNORE}
         )
-
-        
-

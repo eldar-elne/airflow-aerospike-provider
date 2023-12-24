@@ -52,9 +52,9 @@ class AerospikeKeySensor(BaseSensorOperator):
         else:
             raise ValueError(f"Expecting 'list' or 'tuple', got: {type(records)}")
         return metadata
-    
+
     def poke(self, context: Context) -> bool:
-        
+
         with AerospikeHook(self.aerospike_conn_id) as hook:
             self.log.info('Poking %s keys', len(self.key))
             records = hook.exists(namespace=self.namespace, set=self.set, key=self.key, policy=self.policy)
