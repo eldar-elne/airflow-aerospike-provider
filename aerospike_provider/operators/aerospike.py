@@ -10,7 +10,7 @@ from aerospike_provider.hooks.aerospike import AerospikeHook
 from airflow.models.baseoperator import BaseOperator
 
 
-class AerospikePutKey(BaseOperator):
+class AerospikePutKeyOperator(BaseOperator):
     """
     Create a new record, add or remove bins.
     
@@ -57,7 +57,7 @@ class AerospikePutKey(BaseOperator):
             self.log.info('Stored key successfully')
 
 
-class AerospikeGetKey(BaseOperator):
+class AerospikeGetKeyOperator(BaseOperator):
     """
     Read an existing record(s) metadata and all of its bins for a specified key.
 
@@ -96,10 +96,10 @@ class AerospikeGetKey(BaseOperator):
             parsed_records = self.parse_records(records=records)
             self.log.info('Got %s records', len(parsed_records))
             return parsed_records
-        
+    
     def parse_records(self, records: Union[List, tuple]) -> list:
+        # Removing the `bytearray` object from records since object of type bytearray is not JSON serializable for Xcom.
         if isinstance(records, list):
-            # Removing the `bytearray` object from records since object of type bytearray is not JSON serializable for Xcom.
             data = list(map(self.create_dict_from_record, records))
         elif isinstance(records, tuple):
             data = [self.create_dict_from_record(record=records)]
@@ -107,8 +107,8 @@ class AerospikeGetKey(BaseOperator):
             raise ValueError(f"Expecting 'list' or 'tuple', got: {type(records)}")
         return data
     
-
-    def create_dict_from_record(self, record: tuple) -> list:
+    @staticmethod
+    def create_dict_from_record(record: tuple) -> list:
         try:
             return {
                 "namespace": record[0][0], 
