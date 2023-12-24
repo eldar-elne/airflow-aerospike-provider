@@ -35,19 +35,43 @@ class TestAerospikeGetKeyOperator(unittest.TestCase):
             policy={ aerospike.POLICY_KEY_SEND }
         )
 
+    def test_parse_records_as_tuple(self):
+        mock = ( (self.namespace, self.set, self.key), self.metadata, self.bins)
+        mock_parsed = self.operator.parse_records(records=mock)
+        expected = [{"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata, "bins": self.bins}]
+        assert mock_parsed == expected
+
+
+    def test_parse_records_as_list(self):
+        mock = [( (self.namespace, self.set, self.key), self.metadata, self.bins), ( (self.namespace, self.set, self.key), self.metadata, self.bins)]
+        mock_parsed = self.operator.parse_records(records=mock)
+
+        expected = [
+            {"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata, "bins": self.bins}, 
+            {"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata, "bins": self.bins}
+            ]
+        assert mock_parsed == expected
+
+
+    def test_parse_records_as_exception(self):
+        mock = {}
+        with self.assertRaises(ValueError):
+            self.operator.parse_records(records=mock)
+
+
     def test_create_dict_from_record_with_bins(self):
         mock = ( (self.namespace, self.set, self.key), self.metadata, self.bins)
-        mock_parsed = self.operator.create_dict_from_record(record=mock)
+        mock_result = self.operator.create_dict_from_record(record=mock)
         
         expected = {"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata, "bins": self.bins}
-        assert mock_parsed == expected
+        assert mock_result == expected
 
     def test_create_dict_from_record_no_bins(self):
         mock = ( (self.namespace, self.set, self.key), self.metadata)
-        mock_parsed = self.operator.create_dict_from_record(record=mock)
+        mock_result = self.operator.create_dict_from_record(record=mock)
         
         expected = {"namespace": self.namespace, "set": self.set, "key": self.key, "metadata": self.metadata}
-        assert mock_parsed == expected
+        assert mock_result == expected
 
 
 class TestAerospikePutKeyOperator(unittest.TestCase):
