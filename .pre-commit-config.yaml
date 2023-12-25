@@ -1,13 +1,13 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.5.0
     hooks:
       - id: check-ast
       - id: trailing-whitespace
       - id: check-merge-conflict
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: ''
+    rev: 'v1.8.0'
     hooks:
       - id: mypy
         name: mypy
