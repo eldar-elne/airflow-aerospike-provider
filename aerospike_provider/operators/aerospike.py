@@ -31,7 +31,7 @@ class AerospikePutKeyOperator(BaseOperator):
     """
     Create a new record, add or remove bins.
 
-    This can also remove a record (if exists) using `<bin_name>.isnull()` if it's the last bin.
+    This can also remove a record (if exists) using ` `{"bin": aerospuke.null() }`` if it's the last bin.
 
     :param key: key to save in the db.
     :param namespace: namespace to use in aerospike db
