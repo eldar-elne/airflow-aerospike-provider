@@ -18,7 +18,7 @@
 
 """This module allows to connect to a Aerospike database."""
 
-from typing import Tuple, overload, List, Union, Dict, Any, Optional
+from typing import Tuple, overload, List, Union, Dict, Optional
 from types import TracebackType
 
 from airflow.hooks.base import BaseHook
@@ -49,7 +49,7 @@ class AerospikeHook(BaseHook):
         super().__init__(*args, **kwargs)
         self.aerospike_conn_id = aerospike_conn_id
         self.connection = kwargs.pop("connection", None)
-        self.client = None
+        self.client: Client = None
 
     def __enter__(self) -> Client:
         return self.get_conn()
@@ -144,7 +144,7 @@ class AerospikeHook(BaseHook):
 
 
     def test_connection(self) -> Tuple[bool, str]:
-        """Test the Aerospike connection by conneting to it."""
+        """Test the Aerospike connection by conneting to it (`Test` button in the ui)."""
         try:
             self.get_conn().is_connected()
         except Exception as e:
