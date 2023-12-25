@@ -144,7 +144,7 @@ class AerospikeHook(BaseHook):
 
 
     def test_connection(self) -> Tuple[bool, str]:
-        """Test the Aerospike connection by conneting to it."""
+        """Test the Aerospike connection by conneting to it (`Test` button in the ui)."""
         try:
             self.get_conn().is_connected()
         except Exception as e:

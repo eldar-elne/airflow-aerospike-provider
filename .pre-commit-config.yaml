@@ -6,13 +6,13 @@ repos:
       - id: trailing-whitespace
       - id: check-merge-conflict
 
-  # - repo: local
-  #   hooks:
-  #     - id: mypy
-  #       name: mypy
-  #       entry: mypy
-  #       language: system
-  #       types: [python]
-  #       require_serial: true
-  #       verbose: true
-  #       pass_filenames: false
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: mypy --config-file mypy.ini aerospike_provider/
+        language: system
+        types: [python]
+        require_serial: true
+        verbose: true
+        pass_filenames: false
