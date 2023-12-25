@@ -6,7 +6,8 @@ repos:
       - id: trailing-whitespace
       - id: check-merge-conflict
 
-  - repo: local
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: ''
     hooks:
       - id: mypy
         name: mypy
