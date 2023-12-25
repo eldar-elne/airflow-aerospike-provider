@@ -49,7 +49,7 @@ class AerospikeHook(BaseHook):
         super().__init__(*args, **kwargs)
         self.aerospike_conn_id = aerospike_conn_id
         self.connection = kwargs.pop("connection", None)
-        self.client = None
+        self.client: Client = None
 
     def __enter__(self) -> Client:
         return self.get_conn()
