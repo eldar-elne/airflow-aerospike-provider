@@ -18,7 +18,7 @@
 
 """This module allows to connect to a Aerospike database."""
 
-from typing import Tuple, overload, List, Union, Dict, Any, Optional
+from typing import Tuple, overload, List, Union, Dict, Optional
 from types import TracebackType
 
 from airflow.hooks.base import BaseHook
